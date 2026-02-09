@@ -7,6 +7,22 @@ import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Card } from '@/components/ui/Card';
 
+/**
+ * Login Page
+ *
+ * TODO for Interns:
+ * This page is mostly complete, but you need to ensure the auth logic works.
+ *
+ * The login flow:
+ * 1. User enters email and password
+ * 2. Form submits -> handleSubmit is called
+ * 3. useAuth().login() is called with credentials
+ * 4. If successful, redirect to dashboard
+ * 5. If error, show error message
+ *
+ * Make sure your AuthContext login() function is properly implemented!
+ */
+
 export default function LoginPage() {
   const router = useRouter();
   const { login } = useAuth();
@@ -21,10 +37,24 @@ export default function LoginPage() {
     setIsLoading(true);
 
     try {
+      /**
+       * TODO: This calls your login function from AuthContext
+       * Make sure it's implemented correctly!
+       */
       await login(email, password);
       router.push('/dashboard');
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Invalid email or password');
+      /**
+       * TODO: Handle different error types
+       * - Network errors
+       * - Invalid credentials (400/401)
+       * - Server errors (500)
+       */
+      setError(
+        err.response?.data?.message ||
+        err.response?.data?.errors?.non_field_errors?.[0] ||
+        'Invalid email or password'
+      );
     } finally {
       setIsLoading(false);
     }
@@ -73,6 +103,14 @@ export default function LoginPage() {
         <Button type="submit" className="w-full" isLoading={isLoading}>
           Sign in
         </Button>
+
+        {/* Optional: Add registration link */}
+        {/* <p className="mt-4 text-center text-sm text-gray-600">
+          Don't have an account?{' '}
+          <a href="/register" className="text-primary-600 hover:text-primary-700">
+            Register here
+          </a>
+        </p> */}
       </form>
     </Card>
   );
