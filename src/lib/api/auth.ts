@@ -32,8 +32,8 @@ export const authApi = {
    * return response.data;
    */
   login: async (credentials: LoginRequest): Promise<LoginResponse> => {
-    // Your code here
-    throw new Error('Not implemented');
+    const response = await apiClient.post<LoginResponse>('/api/auth/login/', credentials);
+    return response.data;
   },
 
   /**
@@ -47,8 +47,8 @@ export const authApi = {
    * 2. Return response.data
    */
   register: async (data: RegisterRequest): Promise<{ user: User; message: string }> => {
-    // Your code here
-    throw new Error('Not implemented');
+    const response = await apiClient.post<{ user: User; message: string }>('/api/auth/register/', data);
+    return response.data;
   },
 
   /**
@@ -64,8 +64,8 @@ export const authApi = {
    * The access token will be added automatically by the request interceptor.
    */
   getCurrentUser: async (): Promise<User> => {
-    // Your code here
-    throw new Error('Not implemented');
+    const response = await apiClient.get<User>('/api/auth/me/');
+    return response.data;
   },
 
   /**
