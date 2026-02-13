@@ -65,11 +65,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const loadUser = async () => {
       try {
         // TODO: Implement user loading logic
-        // const token = tokenManager.getAccessToken();
-        // if (token) {
-        //   const currentUser = await authApi.getCurrentUser();
-        //   setUser(currentUser);
-        // }
+        const token = tokenManager.getAccessToken();
+        if (token) {
+          const currentUser = await authApi.getCurrentUser();
+          setUser(currentUser);
+        }
       } catch (error) {
         console.error('Failed to load user:', error);
         tokenManager.clearTokens();
@@ -92,8 +92,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
    * This function will be called from the login form!
    */
   const login = async (email: string, password: string) => {
-    // Your code here
-    throw new Error('Not implemented');
+    const credentials = { email, password };
+    try {
+      const response = await authApi.login(credentials);
+      tokenManager.setTokens(response.tokens.access, response.tokens.refresh);
+      setUser(response.user);
+    } catch (error) {
+      console.error('Login failed:', error);
+      throw error; // Re-throw to handle in the login form
+    }
   };
 
   /**
@@ -105,7 +112,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
    * 3. Redirect to login page (window.location.href = '/login')
    */
   const logout = () => {
-    // Your code here
+    tokenManager.clearTokens();
+    setUser(null);
+    window.location.href = '/login';
   };
 
   return (
