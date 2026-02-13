@@ -33,14 +33,12 @@ const apiClient = axios.create({
  */
 apiClient.interceptors.request.use(
   (config) => {
-    // TODO: Add token to request headers
-    // const token = tokenManager.getAccessToken();
-    // if (token) {
-    //   config.headers.Authorization = `Bearer ${token}`;
-    // }
+    const token = tokenManager.getAccessToken();
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
     return config;
-  },
-  (error) => Promise.reject(error)
+  }
 );
 
 /**
@@ -73,6 +71,23 @@ apiClient.interceptors.response.use(
     // - Update Authorization header on original request
     // - Return apiClient(originalRequest) to retry
 
+    const originalRequest: any = error.config;
+
+    if (error.response?.status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true;
+      try {
+        const response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/refresh/`, {
+          refresh: tokenManager.getRefreshToken(),
+        });
+        tokenManager.setTokens(response.data.access, response.data.refresh);
+        originalRequest.headers.Authorization = `Bearer ${response.data.access}`;
+        return apiClient(originalRequest);
+      } catch (refreshError) {
+        tokenManager.clearTokens();
+        window.location.href = '/login/';
+        return Promise.reject(refreshError);
+      }
+    }
     return Promise.reject(error);
   }
 );
