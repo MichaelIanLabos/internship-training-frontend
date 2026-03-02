@@ -8,6 +8,7 @@ import { validators } from '@/lib/utils/validators';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Card } from '@/components/ui/Card';
+import { FaEye, FaEyeSlash } from 'react-icons/fa';
 
 /**
  * Login Page cchangge
@@ -37,6 +38,10 @@ export default function LoginPage() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+
+  // local state for toggling password visibility
+  const [showPassword, setShowPassword] = useState(false);
+  const [showPasswordConfirm, setShowPasswordConfirm] = useState(false);
 
   const switchMode = (nextMode: 'login' | 'register') => {
     setMode(nextMode);
@@ -134,22 +139,20 @@ export default function LoginPage() {
         <button
           type="button"
           onClick={() => switchMode('login')}
-          className={`rounded-md px-3 py-1.5 text-sm font-semibold transition ${
-            mode === 'login'
-              ? 'bg-white text-slate-900 shadow-sm'
-              : 'text-slate-600 hover:text-slate-900'
-          }`}
+          className={`rounded-md px-3 py-1.5 text-sm font-semibold transition ${mode === 'login'
+              ? 'bg-primary-100 text-black shadow-sm'
+              : 'text-primary-600 hover:text-primary-800'
+            }`}
         >
           Sign in
         </button>
         <button
           type="button"
           onClick={() => switchMode('register')}
-          className={`rounded-md px-3 py-1.5 text-sm font-semibold transition ${
-            mode === 'register'
-              ? 'bg-white text-slate-900 shadow-sm'
-              : 'text-slate-600 hover:text-slate-900'
-          }`}
+          className={`rounded-md px-3 py-1.5 text-sm font-semibold transition ${mode === 'register'
+              ? 'bg-primary-100 text-black shadow-sm'
+              : 'text-primary-600 hover:text-primary-800'
+            }`}
         >
           Create account
         </button>
@@ -225,30 +228,58 @@ export default function LoginPage() {
             className="rounded-lg border-slate-300 py-2.5"
           />
 
-          <Input
-            label="Password"
-            type="password"
-            id="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            autoComplete={mode === 'login' ? 'current-password' : 'new-password'}
-            placeholder="Enter your password"
-            className="rounded-lg border-slate-300 py-2.5"
-          />
+          <div className="relative">
+            <Input
+              label="Password"
+              type={showPassword ? 'text' : 'password'}
+              id="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              autoComplete={mode === 'login' ? 'current-password' : 'new-password'}
+              placeholder="Enter your password"
+              className="rounded-lg border-slate-300 py-4 pr-10"
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword((v) => !v)}
+              className="absolute right-0 top-1/2 transform -translate-y-1/2 flex items-center px-3 text-gray-500"
+              aria-label={showPassword ? 'Hide password' : 'Show password'}
+            >
+              {showPassword ? (
+                <FaEyeSlash className="h-5 w-5" />
+              ) : (
+                <FaEye className="h-5 w-5" />
+              )}
+            </button>
+          </div>
 
           {mode === 'register' && (
-            <Input
-              label="Confirm password"
-              type="password"
-              id="passwordConfirm"
-              value={passwordConfirm}
-              onChange={(e) => setPasswordConfirm(e.target.value)}
-              required
-              autoComplete="new-password"
-              placeholder="Re-enter your password"
-              className="rounded-lg border-slate-300 py-2.5"
-            />
+            <div className="relative">
+              <Input
+                label="Confirm password"
+                type={showPasswordConfirm ? 'text' : 'password'}
+                id="passwordConfirm"
+                value={passwordConfirm}
+                onChange={(e) => setPasswordConfirm(e.target.value)}
+                required
+                autoComplete="new-password"
+                placeholder="Re-enter your password"
+                className="rounded-lg border-slate-300 py-4 pr-10"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPasswordConfirm((v) => !v)}
+                className="absolute right-0 top-1/2 transform -translate-y-1/2 flex items-center px-3 text-gray-500"
+                aria-label={showPasswordConfirm ? 'Hide password' : 'Show password'}
+              >
+                {showPasswordConfirm ? (
+                  <FaEyeSlash className="h-5 w-5" />
+                ) : (
+                  <FaEye className="h-5 w-5" />
+                )}
+              </button>
+            </div>
           )}
         </div>
 
