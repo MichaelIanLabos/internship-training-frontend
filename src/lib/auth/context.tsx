@@ -7,9 +7,10 @@ import {
   useEffect,
   ReactNode,
 } from 'react';
-import { User } from '@/types/auth';
+import { LoginResponse, User } from '@/types/auth';
 import { authApi } from '@/lib/api/auth';
 import { tokenManager } from './token';
+import { localAuth } from './local-auth';
 
 /**
  * Authentication Context
@@ -64,12 +65,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     const loadUser = async () => {
       try {
-        // TODO: Implement user loading logic
-        // const token = tokenManager.getAccessToken();
-        // if (token) {
-        //   const currentUser = await authApi.getCurrentUser();
-        //   setUser(currentUser);
-        // }
+        const localSessionUser = localAuth.getSessionUser();
+        if (localSessionUser) {
+          setUser(localSessionUser);
+          return;
+        }
+
+        const token = tokenManager.getAccessToken();
+        if (token) {
+          const currentUser = await authApi.getCurrentUser();
+          setUser(currentUser);
+        }
       } catch (error) {
         console.error('Failed to load user:', error);
         tokenManager.clearTokens();
@@ -92,8 +98,26 @@ export function AuthProvider({ children }: { children: ReactNode }) {
    * This function will be called from the login form!
    */
   const login = async (email: string, password: string) => {
-    // Your code here
-    throw new Error('Not implemented');
+    setIsLoading(true);
+    try {
+      let response: LoginResponse;
+      try {
+        response = await authApi.login({ email, password });
+      } catch {
+        response = localAuth.login({ email, password });
+      }
+
+      const access = response.tokens?.access;
+      const refresh = response.tokens?.refresh;
+      if (access && refresh) {
+        tokenManager.setTokens(access, refresh);
+      }
+      setUser(response.user);
+    } catch (error) {
+      throw error;
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   /**
@@ -105,7 +129,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
    * 3. Redirect to login page (window.location.href = '/login')
    */
   const logout = () => {
-    // Your code here
+    tokenManager.clearTokens();
+    localAuth.clearSession();
+    setUser(null);
+    if (typeof window !== 'undefined') window.location.href = '/login';
   };
 
   return (

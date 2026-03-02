@@ -29,8 +29,8 @@ export const tokenManager = {
    * Return null if not found or if running on server
    */
   getAccessToken: (): string | null => {
-    // Your code here
-    return null;
+    if (typeof window === 'undefined') return null;
+    return localStorage.getItem(ACCESS_TOKEN_KEY);
   },
 
   /**
@@ -38,8 +38,8 @@ export const tokenManager = {
    * Return null if not found or if running on server
    */
   getRefreshToken: (): string | null => {
-    // Your code here
-    return null;
+    if (typeof window === 'undefined') return null;
+    return localStorage.getItem(REFRESH_TOKEN_KEY);
   },
 
   /**
@@ -47,7 +47,9 @@ export const tokenManager = {
    * Check if window is defined first
    */
   setTokens: (access: string, refresh: string): void => {
-    // Your code here
+    if (typeof window === 'undefined') return;
+    if (access) localStorage.setItem(ACCESS_TOKEN_KEY, access);
+    if (refresh) localStorage.setItem(REFRESH_TOKEN_KEY, refresh);
   },
 
   /**
@@ -55,7 +57,9 @@ export const tokenManager = {
    * Check if window is defined first
    */
   clearTokens: (): void => {
-    // Your code here
+    if (typeof window === 'undefined') return;
+    localStorage.removeItem(ACCESS_TOKEN_KEY);
+    localStorage.removeItem(REFRESH_TOKEN_KEY);
   },
 
   /**
@@ -63,7 +67,7 @@ export const tokenManager = {
    * Return true if access token exists
    */
   hasTokens: (): boolean => {
-    // Your code here
-    return false;
+    if (typeof window === 'undefined') return false;
+    return !!localStorage.getItem(ACCESS_TOKEN_KEY);
   },
 };
