@@ -1,0 +1,48 @@
+{
+  "existingEmployee": {
+    "id": 1,
+    "employee_code": "EMP-001",
+    "first_name": "Jane",
+    "last_name": "Doe",
+    "email": "jane.doe@company.com",
+    "employment_status": "active",
+    "created_at": "2024-01-15T00:00:00Z"
+  },
+  "newEmployee": {
+    "first_name": "John",
+    "last_name": "Smith",
+    "middle_name": "",
+    "email": "john.smith@company.com",
+    "phone_number": "+1 555-987-6543",
+    "hire_date": "2024-01-10",
+    "employment_status": "active"
+  },
+  "updatedEmployee": {
+    "first_name": "Jane",
+    "last_name": "Doe",
+    "email": "jane.doe.updated@company.com",
+    "employment_status": "inactive"
+  },
+  "paginatedResponse": {
+    "total_records": 1,
+    "total_pages": 1,
+    "current_page": 1,
+    "records": [
+      {
+        "id": 1,
+        "employee_code": "EMP-001",
+        "first_name": "Jane",
+        "last_name": "Doe",
+        "email": "jane.doe@company.com",
+        "employment_status": "active",
+        "created_at": "2024-01-15T00:00:00Z"
+      }
+    ]
+  },
+  "emptyResponse": {
+    "total_records": 0,
+    "total_pages": 1,
+    "current_page": 1,
+    "records": []
+  }
+}
