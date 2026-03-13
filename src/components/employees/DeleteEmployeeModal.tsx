@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Employee } from '@/types/employee';
 
 // Types
@@ -15,6 +15,10 @@ export function DeleteEmployeeModal({ isOpen, employee, onClose, onDelete }: Del
   // State
   const [isDeleting, setIsDeleting] = useState(false);
   const [error, setError] = useState('');
+
+  useEffect(() => {
+    if (isOpen) setError('');
+  }, [isOpen]);
 
   if (!isOpen || !employee) return null;
 

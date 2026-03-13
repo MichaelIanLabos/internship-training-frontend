@@ -20,7 +20,7 @@ import { BulkDeleteModal } from '@/components/employees/BulkDeleteModal';
 import { Pagination } from '@/components/employees/Pagination';
 
 // Constants
-const PAGE_SIZE = 5;
+const PAGE_SIZE = 10;
 
 // Styles
 const thClass = 'px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500';
@@ -61,6 +61,8 @@ export default function EmployeesPage() {
   // Modal states
   const [showAddModal, setShowAddModal] = useState(false);
   const [showBulkDeleteModal, setShowBulkDeleteModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [editEmployee, setEditEmployee] = useState<Employee | null>(null);
   const [deleteEmployee, setDeleteEmployee] = useState<Employee | null>(null);
 
@@ -98,6 +100,12 @@ export default function EmployeesPage() {
   useEffect(() => {
     setCurrentPage(1);
   }, [debouncedSearch, showDeleted]);
+
+  useEffect(() => {
+    if (employees.length === 0 && currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+    }
+  }, [employees.length, currentPage]);
 
   // Handlers
   const handleSelectAll = () => {
@@ -362,7 +370,7 @@ export default function EmployeesPage() {
                         ) : (
                           <>
                             <button
-                              onClick={() => setEditEmployee(employee)}
+                              onClick={() => { setEditEmployee(employee); setShowEditModal(true); }}
                               className="rounded p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-600 transition-colors"
                             >
                               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
@@ -370,7 +378,7 @@ export default function EmployeesPage() {
                               </svg>
                             </button>
                             <button
-                              onClick={() => setDeleteEmployee(employee)}
+                              onClick={() => { setDeleteEmployee(employee); setShowDeleteModal(true); }}
                               className="rounded p-1 text-gray-400 hover:bg-red-50 hover:text-red-500 transition-colors"
                             >
                               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
@@ -405,15 +413,22 @@ export default function EmployeesPage() {
         onAdd={handleAddEmployee}
       />
       <EditEmployeeModal
-        isOpen={!!editEmployee}
+        isOpen={showEditModal}
         employee={editEmployee}
-        onClose={() => setEditEmployee(null)}
+        onClose={() => {
+          setShowEditModal(false);
+          setEditEmployee(null);
+        }}
         onUpdate={handleUpdateEmployee}
       />
       <DeleteEmployeeModal
-        isOpen={!!deleteEmployee}
+        key={deleteEmployee?.id}
+        isOpen={showDeleteModal}
         employee={deleteEmployee}
-        onClose={() => setDeleteEmployee(null)}
+        onClose={() => {
+          setShowDeleteModal(false);
+          setDeleteEmployee(null);
+        }}
         onDelete={handleDeleteEmployee}
       />
       <BulkDeleteModal
