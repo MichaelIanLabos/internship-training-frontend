@@ -156,7 +156,7 @@ export default function EmployeesPage() {
             Employee Management
           </h1>
           <p className="mt-1 text-sm text-gray-500">
-            Manage your organization's employee records
+            Manage your organization&apos;s employee records
           </p>
         </div>
         <div className="flex items-center gap-3">
