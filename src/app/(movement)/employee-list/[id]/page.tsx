@@ -15,12 +15,15 @@ import {
 } from 'lucide-react';
 import { formatters } from '@/lib/utils/formatters';
 import { useAuth } from '@/lib/auth/context';
+import { MovementStatusBadge } from '@/components/ui/StatusBadge';
+import { MovementTypeBadge } from '@/components/ui/MovementTypeBadge';
 import {
   useMovement,
   useApproveMovement,
   useRejectMovement,
   useDeleteMovement,
 } from '@/lib/hooks/useMovements';
+import { MovementStatus } from '@/lib/constants/movement';
 import { ConfirmActionModal } from '@/components/movements/ConfirmActionModal';
 
 export default function MovementDetailPage() {
@@ -79,7 +82,7 @@ export default function MovementDetailPage() {
     );
   }
 
-  const isPending = movement.status.toLowerCase() === 'pending';
+  const isPending = movement.status.toLowerCase() === MovementStatus.PENDING;
 
   return (
     <div>
@@ -100,7 +103,7 @@ export default function MovementDetailPage() {
                   Movement Request #MR-{new Date(movement.created_at).getFullYear()}-
                   {String(movement.id).padStart(3, '0')}
                 </h1>
-                <StatusBadge status={movement.status} />
+                <MovementStatusBadge status={movement.status} />
               </div>
               <p className="mt-1 text-sm text-gray-500">
                 Submitted on {formatters.date(movement.created_at)}
@@ -147,9 +150,7 @@ export default function MovementDetailPage() {
               {movement.employee_code || `EMP-${String(movement.employee).padStart(3, '0')}`}
             </DetailItem>
             <DetailItem label="Movement Type">
-              <span className="inline-flex items-center rounded-full bg-violet-50 px-3 py-0.5 text-xs font-medium capitalize text-violet-700">
-                {movement.movement_type}
-              </span>
+              <MovementTypeBadge type={movement.movement_type} />
             </DetailItem>
             {movement.effective_date && (
               <DetailItem label="Effective Date">
@@ -197,7 +198,7 @@ export default function MovementDetailPage() {
               <TimelineItem
                 icon={<Clock className="h-3.5 w-3.5" />}
                 iconBg="bg-violet-50 text-violet-600"
-                isLast={movement.status === 'pending'}
+                isLast={movement.status === MovementStatus.PENDING}
               >
                 <p className="text-sm text-gray-700">
                   <strong>Request submitted</strong> by{' '}
@@ -212,14 +213,14 @@ export default function MovementDetailPage() {
               {movement.status !== 'pending' && (
                 <TimelineItem
                   icon={
-                    movement.status === 'approved' ? (
+                    movement.status === MovementStatus.APPROVED ? (
                       <Check className="h-3.5 w-3.5" />
                     ) : (
                       <X className="h-3.5 w-3.5" />
                     )
                   }
                   iconBg={
-                    movement.status === 'approved'
+                    movement.status === MovementStatus.APPROVED
                       ? 'bg-green-50 text-green-600'
                       : 'bg-red-50 text-red-600'
                   }
@@ -250,31 +251,6 @@ export default function MovementDetailPage() {
   );
 }
 
-
-function StatusBadge({ status }: { status: string }) {
-  const styles: Record<string, string> = {
-    pending: 'bg-yellow-100 text-yellow-800',
-    approved: 'bg-green-100 text-green-700',
-    rejected: 'bg-red-100 text-red-700',
-  };
-  const dotStyles: Record<string, string> = {
-    pending: 'bg-yellow-500',
-    approved: 'bg-green-500',
-    rejected: 'bg-red-500',
-  };
-  const key = status.toLowerCase();
-
-  return (
-    <span
-      className={`inline-flex items-center gap-1.5 rounded-full px-3 py-0.5 text-xs font-medium ${styles[key] || 'bg-gray-100 text-gray-700'}`}
-    >
-      <span
-        className={`h-1.5 w-1.5 rounded-full ${dotStyles[key] || 'bg-gray-500'}`}
-      />
-      {formatters.capitalize(status)}
-    </span>
-  );
-}
 
 function DetailItem({
   label,
