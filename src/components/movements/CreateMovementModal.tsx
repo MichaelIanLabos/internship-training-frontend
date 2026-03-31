@@ -5,17 +5,13 @@ import { X as XIcon } from 'lucide-react';
 import { Employee } from '@/types/employee';
 import { MovementCreateRequest } from '@/types/movement';
 import { MOVEMENT_TYPE_OPTIONS } from '@/lib/constants/movement';
+import { labelClass, inputClass, errorClass } from '@/lib/constants/table';
 
 const INITIAL_FORM: MovementCreateRequest = {
   employee: 0,
   movement_type: '',
   remarks: '',
 };
-
-const labelClass = 'block text-sm font-medium text-gray-700';
-const inputClass =
-  'mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-violet-500 focus:outline-none focus:ring-2 focus:ring-violet-500';
-const errorClass = 'mt-1 text-xs text-red-600';
 
 interface CreateMovementModalProps {
   isOpen: boolean;
