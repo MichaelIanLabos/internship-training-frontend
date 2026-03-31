@@ -65,7 +65,7 @@ export function Pagination({ currentPage, totalPages, onPageChange }: Pagination
               onClick={() => onPageChange(page)}
               className={`h-8 w-8 rounded-full text-sm font-medium transition-colors ${
                 page === currentPage
-                  ? 'bg-indigo-500 text-white'
+                  ? 'bg-violet-500 text-white'
                   : 'text-gray-600 hover:bg-gray-100'
               }`}
             >
@@ -91,7 +91,7 @@ export function Pagination({ currentPage, totalPages, onPageChange }: Pagination
           onChange={(e) => setGoToValue(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && handleGoTo()}
           placeholder={`e.g ${totalPages}`}
-          className="w-16 rounded-md border border-gray-300 px-2 py-1 text-sm text-center text-gray-600 placeholder-gray-400 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+          className="w-16 rounded-md border border-gray-300 px-2 py-1 text-sm text-center text-gray-600 placeholder-gray-400 focus:border-violet-500 focus:outline-none focus:ring-1 focus:ring-violet-500"
         />
       </div>
     </div>
