@@ -186,8 +186,7 @@ export function CreateMovementModal({
           <button
             onClick={handleSubmit}
             disabled={isSubmitting}
-            style={{ backgroundColor: '#8b5cf6' }}
-            className="rounded-lg px-6 py-2 text-sm font-medium text-white transition-colors hover:opacity-90 disabled:opacity-50"
+            className="rounded-lg bg-violet-600 px-6 py-2 text-sm font-medium text-white transition-colors hover:bg-violet-700 disabled:opacity-50"
           >
             {isSubmitting ? 'Submitting...' : 'Submit Request'}
           </button>
