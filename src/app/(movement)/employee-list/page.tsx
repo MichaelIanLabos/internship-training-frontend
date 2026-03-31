@@ -222,8 +222,7 @@ export default function EmployeeListPage() {
             </p>
             <button
               onClick={() => refetch()}
-              style={{ backgroundColor: '#4f46e5' }}
-              className="mt-5 inline-flex items-center gap-2 rounded-md px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-violet-700"
+              className="mt-5 inline-flex items-center gap-2 rounded-md bg-violet-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-violet-700"
             >
               <RefreshCw className="h-4 w-4" />
               Retry
@@ -245,8 +244,7 @@ export default function EmployeeListPage() {
             {!statusFilter && (
               <button
                 onClick={() => setShowCreateModal(true)}
-                style={{ backgroundColor: '#4f46e5' }}
-                className="mt-5 inline-flex items-center gap-2 rounded-md px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-violet-700"
+                className="mt-5 inline-flex items-center gap-2 rounded-md bg-violet-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-violet-700"
               >
                 <Plus className="h-4 w-4" />
                 Create First Request
