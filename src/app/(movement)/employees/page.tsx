@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useDebounce } from '@/lib/hooks/useDebounce';
 import {
   Plus,
   Search,
@@ -29,37 +30,16 @@ import { EditEmployeeModal } from '@/components/employees/EditEmployeeModal';
 import { DeleteEmployeeModal } from '@/components/employees/DeleteEmployeeModal';
 import { BulkDeleteModal } from '@/components/employees/BulkDeleteModal';
 import { Pagination } from '@/components/employees/Pagination';
+import { EmploymentStatusBadge } from '@/components/ui/StatusBadge';
 import { PAGE_SIZE, thClass, checkboxClass } from '@/lib/constants/table';
-
-function StatusBadge({ status }: { status: string }) {
-  const isActive = status.toLowerCase() === 'active';
-  const styles = isActive
-    ? 'bg-green-100 text-green-700'
-    : 'bg-yellow-100 text-yellow-700';
-
-  return (
-    <span
-      className={`inline-flex items-center rounded-full px-3 py-0.5 text-xs font-medium ${styles}`}
-    >
-      {formatters.capitalize(status)}
-    </span>
-  );
-}
 
 export default function EmployeesPage() {
   const { user, isLoading: authLoading } = useAuth();
   const [currentPage, setCurrentPage] = useState(1);
   const [searchInput, setSearchInput] = useState('');
-  const [debouncedSearch, setDebouncedSearch] = useState('');
+  const debouncedSearch = useDebounce(searchInput);
   const [showDeleted, setShowDeleted] = useState(false);
   const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setDebouncedSearch(searchInput);
-    }, 300);
-    return () => clearTimeout(timer);
-  }, [searchInput]);
 
   const [showAddModal, setShowAddModal] = useState(false);
   const [showBulkDeleteModal, setShowBulkDeleteModal] = useState(false);
@@ -295,7 +275,7 @@ export default function EmployeesPage() {
                       {employee.email}
                     </td>
                     <td className="px-4 py-3">
-                      <StatusBadge status={employee.employment_status} />
+                      <EmploymentStatusBadge status={employee.employment_status} />
                     </td>
                     <td className="px-4 py-3 text-sm text-gray-500">
                       {formatters.date(employee.created_at)}
