@@ -210,7 +210,7 @@ export default function MovementDetailPage() {
                 </p>
               </TimelineItem>
 
-              {movement.status !== 'pending' && (
+              {movement.status !== MovementStatus.PENDING && (
                 <TimelineItem
                   icon={
                     movement.status === MovementStatus.APPROVED ? (
