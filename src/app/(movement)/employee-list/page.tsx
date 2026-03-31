@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
+import { useDebounce } from '@/lib/hooks/useDebounce';
 import { useRouter } from 'next/navigation';
 import {
   Plus,
@@ -10,8 +11,6 @@ import {
   RefreshCw,
   AlertTriangle,
   Table2,
-  ChevronLeft,
-  ChevronRight,
   Loader2,
   MoreVertical,
 } from 'lucide-react';
@@ -26,43 +25,13 @@ import {
   useDeleteMovement,
 } from '@/lib/hooks/useMovements';
 import { Movement, MovementCreateRequest } from '@/types/movement';
-import { MOVEMENT_TYPE_OPTIONS } from '@/lib/constants/movement';
+import { MOVEMENT_TYPE_OPTIONS, MOVEMENT_STATUS_OPTIONS, MovementStatus } from '@/lib/constants/movement';
 import { CreateMovementModal } from '@/components/movements/CreateMovementModal';
 import { ConfirmActionModal } from '@/components/movements/ConfirmActionModal';
+import { MovementStatusBadge } from '@/components/ui/StatusBadge';
+import { MovementTypeBadge } from '@/components/ui/MovementTypeBadge';
+import { Pagination } from '@/components/employees/Pagination';
 import { PAGE_SIZE, thClass } from '@/lib/constants/table';
-
-function StatusBadge({ status }: { status: string }) {
-  const styles: Record<string, string> = {
-    pending: 'bg-yellow-100 text-yellow-800',
-    approved: 'bg-green-100 text-green-700',
-    rejected: 'bg-red-100 text-red-700',
-  };
-  const dotStyles: Record<string, string> = {
-    pending: 'bg-yellow-500',
-    approved: 'bg-green-500',
-    rejected: 'bg-red-500',
-  };
-  const key = status.toLowerCase();
-
-  return (
-    <span
-      className={`inline-flex items-center gap-1.5 rounded-full px-3 py-0.5 text-xs font-medium ${styles[key] || 'bg-gray-100 text-gray-700'}`}
-    >
-      <span
-        className={`h-1.5 w-1.5 rounded-full ${dotStyles[key] || 'bg-gray-500'}`}
-      />
-      {formatters.capitalize(status)}
-    </span>
-  );
-}
-
-function MovementTypeBadge({ type }: { type: string }) {
-  return (
-    <span className="inline-flex items-center rounded-full bg-violet-50 px-3 py-0.5 text-xs font-medium capitalize text-violet-700">
-      {type}
-    </span>
-  );
-}
 
 export default function EmployeeListPage() {
   const router = useRouter();
@@ -71,7 +40,7 @@ export default function EmployeeListPage() {
   const [statusFilter, setStatusFilter] = useState('');
   const [typeFilter, setTypeFilter] = useState('');
   const [searchInput, setSearchInput] = useState('');
-  const [debouncedSearch, setDebouncedSearch] = useState('');
+  const debouncedSearch = useDebounce(searchInput);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [confirmAction, setConfirmAction] = useState<{
     id: number;
@@ -79,13 +48,6 @@ export default function EmployeeListPage() {
   } | null>(null);
 
   const isReady = !authLoading && !!user;
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setDebouncedSearch(searchInput);
-    }, 300);
-    return () => clearTimeout(timer);
-  }, [searchInput]);
 
   const { data, isLoading, isError, error, refetch } = useMovements({
     page: currentPage,
@@ -108,19 +70,19 @@ export default function EmployeeListPage() {
   const { data: pendingData } = useMovements({
     page: 1,
     page_size: 1,
-    status: 'pending',
+    status: MovementStatus.PENDING,
     enabled: isReady,
   });
   const { data: approvedData } = useMovements({
     page: 1,
     page_size: 1,
-    status: 'approved',
+    status: MovementStatus.APPROVED,
     enabled: isReady,
   });
   const { data: rejectedData } = useMovements({
     page: 1,
     page_size: 1,
-    status: 'rejected',
+    status: MovementStatus.REJECTED,
     enabled: isReady,
   });
 
@@ -160,9 +122,6 @@ export default function EmployeeListPage() {
       await deleteMutation.mutateAsync(confirmAction.id);
     }
   };
-
-  const startRecord = movements.length > 0 ? (currentPage - 1) * PAGE_SIZE + 1 : 0;
-  const endRecord = startRecord + movements.length - 1;
 
   return (
     <div>
@@ -216,9 +175,11 @@ export default function EmployeeListPage() {
                 className="rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-700 outline-none focus:border-violet-500 focus:ring-1 focus:ring-violet-500"
               >
                 <option value="">All Status</option>
-                <option value="pending">Pending</option>
-                <option value="approved">Approved</option>
-                <option value="rejected">Rejected</option>
+                {MOVEMENT_STATUS_OPTIONS.map((opt) => (
+                  <option key={opt.value} value={opt.value}>
+                    {opt.label}
+                  </option>
+                ))}
               </select>
             </div>
             <div className="flex flex-col gap-1">
@@ -331,7 +292,7 @@ export default function EmployeeListPage() {
                         <MovementTypeBadge type={movement.movement_type} />
                       </td>
                       <td className="px-4 py-3.5">
-                        <StatusBadge status={movement.status} />
+                        <MovementStatusBadge status={movement.status} />
                       </td>
                       <td className="px-4 py-3.5 text-sm text-gray-500">
                         {movement.requested_by_first_name}{' '}
@@ -373,20 +334,18 @@ export default function EmployeeListPage() {
               </table>
             </div>
 
-            {/* Table Footer */}
-            <div className="flex items-center justify-between border-t border-gray-200 px-4 py-3 text-sm text-gray-500">
-              <span>
-                Showing {startRecord}-{endRecord} of {totalRecords} requests
-              </span>
-              <TablePagination
-                currentPage={currentPage}
-                totalPages={totalPages}
-                onPageChange={setCurrentPage}
-              />
-            </div>
           </>
         )}
       </div>
+
+      {/* Pagination */}
+      {!isLoading && movements.length > 0 && (
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={setCurrentPage}
+        />
+      )}
 
       {/* Modals */}
       <CreateMovementModal
@@ -454,7 +413,7 @@ function ActionButtons({
 
   if (!user) return null;
 
-  const isPending = movement.status.toLowerCase() === 'pending';
+  const isPending = movement.status.toLowerCase() === MovementStatus.PENDING;
 
   if (!isPending) {
     return (
@@ -499,71 +458,6 @@ function ActionButtons({
           </button>
         </div>
       )}
-    </div>
-  );
-}
-
-function TablePagination({
-  currentPage,
-  totalPages,
-  onPageChange,
-}: {
-  currentPage: number;
-  totalPages: number;
-  onPageChange: (page: number) => void;
-}) {
-  const pages: (number | string)[] = [];
-
-  for (let i = 1; i <= totalPages; i++) {
-    if (
-      i === 1 ||
-      i === totalPages ||
-      (i >= currentPage - 1 && i <= currentPage + 1)
-    ) {
-      pages.push(i);
-    } else if (pages[pages.length - 1] !== '...') {
-      pages.push('...');
-    }
-  }
-
-  const btnBase =
-    'min-w-[32px] rounded-md border px-2.5 py-1.5 text-[13px] transition-colors';
-
-  return (
-    <div className="flex items-center gap-1">
-      <button
-        onClick={() => onPageChange(Math.max(1, currentPage - 1))}
-        disabled={currentPage === 1}
-        className={`${btnBase} border-gray-300 bg-white text-gray-700 hover:bg-gray-50 disabled:opacity-40`}
-      >
-        <ChevronLeft className="h-4 w-4" />
-      </button>
-      {pages.map((p, i) =>
-        typeof p === 'string' ? (
-          <span key={`ellipsis-${i}`} className="px-1.5 py-1.5 text-[13px] text-gray-400">
-            ...
-          </span>
-        ) : (
-          <button
-            key={p}
-            onClick={() => onPageChange(p)}
-            className={`${btnBase} ${
-              p === currentPage
-                ? 'border-violet-600 bg-violet-600 text-white'
-                : 'border-gray-300 bg-white text-gray-700 hover:bg-gray-50'
-            }`}
-          >
-            {p}
-          </button>
-        )
-      )}
-      <button
-        onClick={() => onPageChange(Math.min(totalPages, currentPage + 1))}
-        disabled={currentPage === totalPages}
-        className={`${btnBase} border-gray-300 bg-white text-gray-700 hover:bg-gray-50 disabled:opacity-40`}
-      >
-        <ChevronRight className="h-4 w-4" />
-      </button>
     </div>
   );
 }
