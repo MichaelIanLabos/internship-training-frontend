@@ -1,6 +1,6 @@
 import apiClient from './client';
 import { Movement, MovementCreateRequest } from '@/types/movement';
-import { PaginatedResponse } from '@/types/employee';
+import { PaginatedResponse } from '@/types/api';
 
 export const movementApi = {
   list: async (params: {
