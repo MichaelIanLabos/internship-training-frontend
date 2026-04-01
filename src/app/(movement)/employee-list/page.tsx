@@ -33,12 +33,13 @@ import { DeleteMovementModal } from '@/components/movements/DeleteMovementModal'
 import { MovementStatusBadge } from '@/components/ui/StatusBadge';
 import { MovementTypeBadge } from '@/components/ui/MovementTypeBadge';
 import { Pagination } from '@/components/employees/Pagination';
-import { PAGE_SIZE, thClass } from '@/lib/constants/table';
+import { thClass } from '@/lib/constants/table';
 
 export default function EmployeeListPage() {
   const router = useRouter();
   const { user, isLoading: authLoading } = useAuth();
   const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
   const [statusFilter, setStatusFilter] = useState('');
   const [typeFilter, setTypeFilter] = useState('');
   const [searchInput, setSearchInput] = useState('');
@@ -52,7 +53,7 @@ export default function EmployeeListPage() {
 
   const { data, isLoading, isError, error, refetch } = useMovements({
     page: currentPage,
-    page_size: PAGE_SIZE,
+    page_size: pageSize,
     status: statusFilter || undefined,
     movement_type: typeFilter || undefined,
     search: debouncedSearch || undefined,
@@ -104,10 +105,10 @@ export default function EmployeeListPage() {
   }, [statusFilter, typeFilter, debouncedSearch]);
 
   useEffect(() => {
-    if (movements.length === 0 && currentPage > 1) {
+    if (!isLoading && movements.length === 0 && currentPage > 1) {
       setCurrentPage(currentPage - 1);
     }
-  }, [movements.length, currentPage]);
+  }, [movements.length, currentPage, isLoading]);
 
   const handleCreate = async (formData: MovementCreateRequest) => {
     await createMutation.mutateAsync(formData);
@@ -324,11 +325,13 @@ export default function EmployeeListPage() {
       </div>
 
       {/* Pagination */}
-      {!isLoading && movements.length > 0 && (
+      {!isLoading && (
         <Pagination
           currentPage={currentPage}
           totalPages={totalPages}
+          pageSize={pageSize}
           onPageChange={setCurrentPage}
+          onPageSizeChange={(size) => { setPageSize(size); setCurrentPage(1); }}
         />
       )}
 

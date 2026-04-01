@@ -33,11 +33,12 @@ import { DeleteEmployeeModal } from '@/components/employees/DeleteEmployeeModal'
 import { BulkDeleteModal } from '@/components/employees/BulkDeleteModal';
 import { Pagination } from '@/components/employees/Pagination';
 import { EmploymentStatusBadge } from '@/components/ui/StatusBadge';
-import { PAGE_SIZE, thClass, checkboxClass } from '@/lib/constants/table';
+import { thClass, checkboxClass } from '@/lib/constants/table';
 
 export default function EmployeesPage() {
   const { user, isLoading: authLoading } = useAuth();
   const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
   const [searchInput, setSearchInput] = useState('');
   const debouncedSearch = useDebounce(searchInput);
   const [showDeleted, setShowDeleted] = useState(false);
@@ -58,7 +59,7 @@ export default function EmployeesPage() {
     refetch,
   } = useEmployees({
     page: currentPage,
-    page_size: PAGE_SIZE,
+    page_size: pageSize,
     search: debouncedSearch || undefined,
     show_deleted: showDeleted || undefined,
     enabled: !authLoading && !!user,
@@ -84,10 +85,10 @@ export default function EmployeesPage() {
   }, [debouncedSearch, showDeleted]);
 
   useEffect(() => {
-    if (employees.length === 0 && currentPage > 1) {
+    if (!isLoading && employees.length === 0 && currentPage > 1) {
       setCurrentPage(currentPage - 1);
     }
-  }, [employees.length, currentPage]);
+  }, [employees.length, currentPage, isLoading]);
 
   const handleSelectAll = () => {
     if (selectedIds.size === employees.length) {
@@ -254,7 +255,6 @@ export default function EmployeesPage() {
                       className={checkboxClass}
                     />
                   </th>
-                  <th scope="col" className={thClass}>Employee Code</th>
                   <th scope="col" className={thClass}>Full Name</th>
                   <th scope="col" className={thClass}>Email</th>
                   <th scope="col" className={thClass}>Status</th>
@@ -275,9 +275,6 @@ export default function EmployeesPage() {
                         onChange={() => handleSelectOne(employee.id)}
                         className={checkboxClass}
                       />
-                    </td>
-                    <td className="px-4 py-3 text-sm font-medium text-violet-600">
-                      {employee.employee_code}
                     </td>
                     <td className="px-4 py-3 text-sm text-gray-900">
                       {employee.first_name} {employee.last_name}
@@ -327,11 +324,13 @@ export default function EmployeesPage() {
         )}
       </div>
 
-      {!isLoading && employees.length > 0 && (
+      {!isLoading && (
         <Pagination
           currentPage={currentPage}
           totalPages={totalPages}
+          pageSize={pageSize}
           onPageChange={setCurrentPage}
+          onPageSizeChange={(size) => { setPageSize(size); setCurrentPage(1); }}
         />
       )}
 
