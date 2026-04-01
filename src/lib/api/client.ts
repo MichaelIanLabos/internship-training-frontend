@@ -84,7 +84,9 @@ apiClient.interceptors.response.use(
         return apiClient(originalRequest);
       } catch (refreshError) {
         tokenManager.clearTokens();
-        window.location.href = '/login/';
+        if (typeof window !== 'undefined') {
+          window.location.href = '/login/';
+        }
         return Promise.reject(refreshError);
       }
     }

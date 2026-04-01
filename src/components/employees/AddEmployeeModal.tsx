@@ -1,7 +1,9 @@
 'use client';
 
 import { useState } from 'react';
+import { X as XIcon } from 'lucide-react';
 import { EmployeeCreateRequest } from '@/types/employee';
+import { labelClass, inputClass, errorClass } from '@/lib/constants/table';
 
 // Constants
 const INITIAL_FORM = {
@@ -13,11 +15,6 @@ const INITIAL_FORM = {
   hire_date: '',
   employment_status: 'active',
 };
-
-// Styles
-const labelClass = 'block text-sm font-medium text-gray-700';
-const inputClass = 'mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500';
-const errorClass = 'mt-1 text-xs text-red-600';
 
 // Types
 interface AddEmployeeModalProps {
@@ -83,9 +80,7 @@ export function AddEmployeeModal({ isOpen, onClose, onAdd }: AddEmployeeModalPro
             onClick={handleClose}
             className="rounded p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-600 transition-colors"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-              <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
-            </svg>
+            <XIcon className="h-5 w-5" />
           </button>
         </div>
 
@@ -188,8 +183,7 @@ export function AddEmployeeModal({ isOpen, onClose, onAdd }: AddEmployeeModalPro
           <button
             onClick={handleSubmit}
             disabled={isSubmitting}
-            style={{ backgroundColor: '#6366F1' }}
-            className="rounded-lg px-6 py-2 text-sm font-medium text-white hover:opacity-90 transition-colors disabled:opacity-50"
+            className="rounded-lg bg-violet-600 px-6 py-2 text-sm font-medium text-white hover:bg-violet-700 transition-colors disabled:opacity-50"
           >
             {isSubmitting ? 'Adding...' : 'Add Employee'}
           </button>
