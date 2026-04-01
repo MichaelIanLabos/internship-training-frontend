@@ -9,7 +9,6 @@ import {
   Check,
   X,
   Clock,
-  Eye,
   Loader2,
   AlertTriangle,
 } from 'lucide-react';
@@ -19,12 +18,16 @@ import { MovementStatusBadge } from '@/components/ui/StatusBadge';
 import { MovementTypeBadge } from '@/components/ui/MovementTypeBadge';
 import {
   useMovement,
+  useUpdateMovement,
   useApproveMovement,
   useRejectMovement,
   useDeleteMovement,
 } from '@/lib/hooks/useMovements';
 import { MovementStatus } from '@/lib/constants/movement';
-import { ConfirmActionModal } from '@/components/movements/ConfirmActionModal';
+import { ApproveMovementModal } from '@/components/movements/ApproveMovementModal';
+import { RejectMovementModal } from '@/components/movements/RejectMovementModal';
+import { DeleteMovementModal } from '@/components/movements/DeleteMovementModal';
+import { EditMovementModal } from '@/components/movements/EditMovementModal';
 
 export default function MovementDetailPage() {
   const params = useParams();
@@ -37,24 +40,31 @@ export default function MovementDetailPage() {
     !authLoading && !!user
   );
 
+  const updateMutation = useUpdateMovement();
   const approveMutation = useApproveMovement();
   const rejectMutation = useRejectMovement();
   const deleteMutation = useDeleteMovement();
 
-  const [confirmAction, setConfirmAction] = useState<
-    'approve' | 'reject' | 'delete' | null
-  >(null);
+  const [showApproveModal, setShowApproveModal] = useState(false);
+  const [showRejectModal, setShowRejectModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
 
-  const handleConfirm = async () => {
-    if (!confirmAction) return;
-    if (confirmAction === 'approve') {
-      await approveMutation.mutateAsync(id);
-    } else if (confirmAction === 'reject') {
-      await rejectMutation.mutateAsync(id);
-    } else {
-      await deleteMutation.mutateAsync(id);
-      router.push('/employee-list');
-    }
+  const handleApprove = async () => {
+    await approveMutation.mutateAsync(id);
+  };
+
+  const handleReject = async (remarks: string) => {
+    await rejectMutation.mutateAsync({ id, remarks });
+  };
+
+  const handleDelete = async () => {
+    await deleteMutation.mutateAsync(id);
+    router.push('/employee-list');
+  };
+
+  const handleUpdate = async (data: Parameters<typeof updateMutation.mutateAsync>[0]['data']) => {
+    await updateMutation.mutateAsync({ id, data });
   };
 
   if (isLoading) {
@@ -112,26 +122,29 @@ export default function MovementDetailPage() {
             <div className="flex items-center gap-2.5">
               {isPending && (
                 <>
-                  <button className="inline-flex items-center gap-1.5 rounded-full border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50">
+                  <button
+                    onClick={() => setShowEditModal(true)}
+                    className="inline-flex items-center gap-1.5 rounded-full border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50"
+                  >
                     <Pencil className="h-3.5 w-3.5" />
                     Edit
                   </button>
                   <button
-                    onClick={() => setConfirmAction('delete')}
+                    onClick={() => setShowDeleteModal(true)}
                     className="inline-flex items-center gap-1.5 rounded-full bg-red-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-red-700"
                   >
                     <Trash2 className="h-3.5 w-3.5" />
                     Delete
                   </button>
                   <button
-                    onClick={() => setConfirmAction('approve')}
+                    onClick={() => setShowApproveModal(true)}
                     className="inline-flex items-center gap-1.5 rounded-full bg-green-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-green-700"
                   >
                     <Check className="h-3.5 w-3.5" />
                     Approve
                   </button>
                   <button
-                    onClick={() => setConfirmAction('reject')}
+                    onClick={() => setShowRejectModal(true)}
                     className="inline-flex items-center gap-1.5 rounded-full border border-violet-300 bg-white px-4 py-2 text-sm font-medium text-violet-700 transition-colors hover:bg-violet-50"
                   >
                     <X className="h-3.5 w-3.5" />
@@ -241,11 +254,27 @@ export default function MovementDetailPage() {
         </div>
       </div>
 
-      <ConfirmActionModal
-        isOpen={!!confirmAction}
-        action={confirmAction || 'approve'}
-        onClose={() => setConfirmAction(null)}
-        onConfirm={handleConfirm}
+      {/* Modals */}
+      <ApproveMovementModal
+        isOpen={showApproveModal}
+        onClose={() => setShowApproveModal(false)}
+        onConfirm={handleApprove}
+      />
+      <RejectMovementModal
+        isOpen={showRejectModal}
+        onClose={() => setShowRejectModal(false)}
+        onConfirm={handleReject}
+      />
+      <DeleteMovementModal
+        isOpen={showDeleteModal}
+        onClose={() => setShowDeleteModal(false)}
+        onConfirm={handleDelete}
+      />
+      <EditMovementModal
+        isOpen={showEditModal}
+        movement={movement}
+        onClose={() => setShowEditModal(false)}
+        onUpdate={handleUpdate}
       />
     </div>
   );
