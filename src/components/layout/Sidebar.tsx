@@ -11,7 +11,7 @@ export function Sidebar() {
   const { logout } = useAuth();
 
   return (
-    <aside className="flex w-[250px] flex-shrink-0 flex-col overflow-hidden rounded-r-2xl bg-gradient-to-b from-violet-500 to-violet-400 shadow-lg shadow-violet-500/20">
+    <aside className="flex w-[250px] flex-shrink-0 flex-col overflow-hidden bg-gradient-to-b from-violet-500 to-violet-400">
       <div className="px-6 pb-4 pt-6">
         <span className="text-lg font-bold tracking-wide text-white drop-shadow-sm">
           HR System
