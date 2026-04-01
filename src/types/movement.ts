@@ -1,11 +1,13 @@
+import { MovementType, MovementStatus } from '@/lib/constants/movement';
+
 export interface Movement {
   id: number;
   employee: number;
   employee_code?: string;
   employee_first_name: string;
   employee_last_name: string;
-  movement_type: string;
-  status: string;
+  movement_type: MovementType;
+  status: MovementStatus;
   remarks: string;
   requested_by: number;
   requested_by_first_name: string;
@@ -24,7 +26,7 @@ export interface Movement {
 
 export interface MovementCreateRequest {
   employee: number;
-  movement_type: string;
+  movement_type: MovementType | '';
   remarks?: string;
   effective_date?: string;
   current_department?: string;
