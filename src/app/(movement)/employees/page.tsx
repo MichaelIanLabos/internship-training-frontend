@@ -12,6 +12,7 @@ import {
   AlertTriangle,
   RefreshCw,
   Loader2,
+  Sprout,
 } from 'lucide-react';
 import { Employee } from '@/types/employee';
 import { formatters } from '@/lib/utils/formatters';
@@ -24,6 +25,7 @@ import {
   useRestoreEmployee,
   useBulkDeleteEmployees,
   useBulkRestoreEmployees,
+  useSeedEmployees,
 } from '@/lib/hooks/useEmployees';
 import { AddEmployeeModal } from '@/components/employees/AddEmployeeModal';
 import { EditEmployeeModal } from '@/components/employees/EditEmployeeModal';
@@ -71,6 +73,7 @@ export default function EmployeesPage() {
   const restoreMutation = useRestoreEmployee();
   const bulkDeleteMutation = useBulkDeleteEmployees();
   const bulkRestoreMutation = useBulkRestoreEmployees();
+  const seedMutation = useSeedEmployees();
 
   useEffect(() => {
     setSelectedIds(new Set());
@@ -157,6 +160,14 @@ export default function EmployeesPage() {
               </button>
             )
           )}
+          <button
+            onClick={() => seedMutation.mutate()}
+            disabled={seedMutation.isPending}
+            className="inline-flex items-center gap-2 rounded-lg border border-violet-300 bg-violet-50 px-5 h-10 text-sm font-medium text-violet-700 shadow-sm hover:bg-violet-100 transition-colors disabled:opacity-50"
+          >
+            <Sprout className="h-4 w-4" />
+            {seedMutation.isPending ? 'Seeding...' : 'Seed Data'}
+          </button>
           <button
             onClick={() => setShowAddModal(true)}
             className="inline-flex items-center gap-2 rounded-lg bg-violet-600 px-5 h-10 text-sm font-medium text-white shadow-sm hover:bg-violet-700 transition-colors"
