@@ -1,7 +1,5 @@
 'use client';
 
-import { useState } from 'react';
-
 // Types
 interface PaginationProps {
   currentPage: number;
@@ -14,8 +12,6 @@ const arrowBtnClass = 'text-sm text-gray-500 hover:text-gray-700 disabled:opacit
 
 export function Pagination({ currentPage, totalPages, onPageChange }: PaginationProps) {
   // State
-  const [goToValue, setGoToValue] = useState('');
-
   if (totalPages <= 1) return null;
 
   // Page number calculation
@@ -33,18 +29,9 @@ export function Pagination({ currentPage, totalPages, onPageChange }: Pagination
     }
   }
 
-  // Handlers
-  const handleGoTo = () => {
-    const page = parseInt(goToValue, 10);
-    if (page >= 1 && page <= totalPages) {
-      onPageChange(page);
-      setGoToValue('');
-    }
-  };
-
   // Render
   return (
-    <div className="flex items-center justify-center gap-4 py-4">
+    <div className="flex items-center justify-end gap-4 py-4">
       <button
         onClick={() => onPageChange(currentPage - 1)}
         disabled={currentPage === 1}
@@ -83,17 +70,6 @@ export function Pagination({ currentPage, totalPages, onPageChange }: Pagination
         &gt;
       </button>
 
-      <div className="flex items-center gap-2">
-        <span className="text-sm text-gray-500">Go to</span>
-        <input
-          type="text"
-          value={goToValue}
-          onChange={(e) => setGoToValue(e.target.value)}
-          onKeyDown={(e) => e.key === 'Enter' && handleGoTo()}
-          placeholder={`e.g ${totalPages}`}
-          className="w-16 rounded-md border border-gray-300 px-2 py-1 text-sm text-center text-gray-600 placeholder-gray-400 focus:border-violet-500 focus:outline-none focus:ring-1 focus:ring-violet-500"
-        />
-      </div>
     </div>
   );
 }
