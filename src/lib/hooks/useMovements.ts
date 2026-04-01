@@ -1,10 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { movementApi } from '@/lib/api/movement';
-import { getMockMovements, getMockMovementById } from '@/lib/mock/movements';
 import { Movement, MovementCreateRequest } from '@/types/movement';
 import { PaginatedResponse } from '@/types/employee';
-
-const USE_MOCK_DATA = true;
 
 const MOVEMENT_QUERY_KEY = 'movements';
 
@@ -20,10 +17,7 @@ export function useMovements(params: {
 
   return useQuery<PaginatedResponse<Movement>>({
     queryKey: [MOVEMENT_QUERY_KEY, apiParams.page, apiParams.page_size, apiParams.status ?? 'all', apiParams.movement_type ?? 'all', apiParams.search ?? ''],
-    queryFn: () =>
-      USE_MOCK_DATA
-        ? Promise.resolve(getMockMovements(apiParams))
-        : movementApi.list(apiParams),
+    queryFn: () => movementApi.list(apiParams),
     enabled,
   });
 }
@@ -31,10 +25,7 @@ export function useMovements(params: {
 export function useMovement(id: number, enabled = true) {
   return useQuery<Movement | null>({
     queryKey: [MOVEMENT_QUERY_KEY, 'detail', id],
-    queryFn: () =>
-      USE_MOCK_DATA
-        ? Promise.resolve(getMockMovementById(id))
-        : movementApi.getById(id),
+    queryFn: () => movementApi.getById(id),
     enabled,
   });
 }
@@ -61,6 +52,18 @@ export function useCreateMovement() {
   });
 }
 
+export function useUpdateMovement() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ id, data }: { id: number; data: Partial<MovementCreateRequest> }) =>
+      movementApi.update(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [MOVEMENT_QUERY_KEY] });
+    },
+  });
+}
+
 export function useApproveMovement() {
   const queryClient = useQueryClient();
 
@@ -76,7 +79,8 @@ export function useRejectMovement() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (id: number) => movementApi.reject(id),
+    mutationFn: ({ id, remarks }: { id: number; remarks?: string }) =>
+      movementApi.reject(id, remarks),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [MOVEMENT_QUERY_KEY] });
     },
