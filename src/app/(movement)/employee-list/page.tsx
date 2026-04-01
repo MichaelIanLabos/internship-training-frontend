@@ -62,31 +62,20 @@ export default function EmployeeListPage() {
 
   const movements = data?.records || [];
   const totalPages = data?.total_pages || 1;
-  const totalRecords = data?.total_records || 0;
 
-  const { data: allData } = useMovements({
+  // Single query for all stat counts — fetch all records to count by status
+  const { data: allMovementsData } = useMovements({
     page: 1,
-    page_size: 1,
+    page_size: 9999,
     enabled: isReady,
   });
-  const { data: pendingData } = useMovements({
-    page: 1,
-    page_size: 1,
-    status: MovementStatus.PENDING,
-    enabled: isReady,
-  });
-  const { data: approvedData } = useMovements({
-    page: 1,
-    page_size: 1,
-    status: MovementStatus.APPROVED,
-    enabled: isReady,
-  });
-  const { data: rejectedData } = useMovements({
-    page: 1,
-    page_size: 1,
-    status: MovementStatus.REJECTED,
-    enabled: isReady,
-  });
+  const allMovements = allMovementsData?.records || [];
+  const stats = {
+    total: allMovementsData?.total_records ?? 0,
+    pending: allMovements.filter((m) => m.status === MovementStatus.PENDING).length,
+    approved: allMovements.filter((m) => m.status === MovementStatus.APPROVED).length,
+    rejected: allMovements.filter((m) => m.status === MovementStatus.REJECTED).length,
+  };
 
   const { data: employeeData } = useEmployees({
     page: 1,
@@ -130,20 +119,20 @@ export default function EmployeeListPage() {
     <div>
       <h2 className="mb-3 text-sm font-semibold text-gray-700">Request Summary</h2>
       <div className="mb-6 grid grid-cols-4 gap-5">
-        <StatCard label="Total Requests" value={allData?.total_records} />
+        <StatCard label="Total Requests" value={stats.total} />
         <StatCard
           label="Pending"
-          value={pendingData?.total_records}
+          value={stats.pending}
           color="text-amber-500"
         />
         <StatCard
           label="Approved"
-          value={approvedData?.total_records}
+          value={stats.approved}
           color="text-green-600"
         />
         <StatCard
           label="Rejected"
-          value={rejectedData?.total_records}
+          value={stats.rejected}
           color="text-red-600"
         />
       </div>

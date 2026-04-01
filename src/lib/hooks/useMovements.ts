@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { movementApi } from '@/lib/api/movement';
 import { Movement, MovementCreateRequest } from '@/types/movement';
-import { PaginatedResponse } from '@/types/employee';
+import { PaginatedResponse } from '@/types/api';
 
 const MOVEMENT_QUERY_KEY = 'movements';
 
