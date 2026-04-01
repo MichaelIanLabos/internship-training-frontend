@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { X as XIcon } from 'lucide-react';
 import { labelClass, inputClass, errorClass } from '@/lib/constants/table';
+import { getApiError } from '@/lib/utils/errors';
 
 interface RejectMovementModalProps {
   isOpen: boolean;
@@ -30,8 +31,8 @@ export function RejectMovementModal({ isOpen, onClose, onConfirm }: RejectMoveme
       await onConfirm(remarks.trim());
       setRemarks('');
       onClose();
-    } catch (err: any) {
-      setError(err.response?.data?.detail || 'Failed to reject request.');
+    } catch (err: unknown) {
+      setError(getApiError(err, 'Failed to reject request.'));
     } finally {
       setIsLoading(false);
     }
