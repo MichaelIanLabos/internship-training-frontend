@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { Trash2 } from 'lucide-react';
+import { getApiError } from '@/lib/utils/errors';
 
 interface DeleteMovementModalProps {
   isOpen: boolean;
@@ -21,8 +22,8 @@ export function DeleteMovementModal({ isOpen, onClose, onConfirm }: DeleteMoveme
     try {
       await onConfirm();
       onClose();
-    } catch (err: any) {
-      setError(err.response?.data?.detail || 'Failed to delete request.');
+    } catch (err: unknown) {
+      setError(getApiError(err, 'Failed to delete request.'));
     } finally {
       setIsLoading(false);
     }
