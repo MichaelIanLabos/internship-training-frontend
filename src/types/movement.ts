@@ -26,4 +26,9 @@ export interface MovementCreateRequest {
   employee: number;
   movement_type: string;
   remarks?: string;
+  effective_date?: string;
+  current_department?: string;
+  target_department?: string;
+  current_position?: string;
+  new_position?: string;
 }

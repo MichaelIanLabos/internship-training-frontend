@@ -139,47 +139,51 @@ export function EditMovementModal({ isOpen, movement, onClose, onUpdate }: EditM
               />
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className={labelClass}>Current Department</label>
-                <input
-                  type="text"
-                  value={form.current_department}
-                  onChange={(e) => setForm({ ...form, current_department: e.target.value })}
-                  className={inputClass}
-                />
-              </div>
-              <div>
-                <label className={labelClass}>Target Department</label>
-                <input
-                  type="text"
-                  value={form.target_department}
-                  onChange={(e) => setForm({ ...form, target_department: e.target.value })}
-                  className={inputClass}
-                />
-              </div>
-            </div>
+            {form.movement_type === 'transfer' && (
+              <>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className={labelClass}>Current Department</label>
+                    <input
+                      type="text"
+                      value={form.current_department}
+                      onChange={(e) => setForm({ ...form, current_department: e.target.value })}
+                      className={inputClass}
+                    />
+                  </div>
+                  <div>
+                    <label className={labelClass}>Target Department</label>
+                    <input
+                      type="text"
+                      value={form.target_department}
+                      onChange={(e) => setForm({ ...form, target_department: e.target.value })}
+                      className={inputClass}
+                    />
+                  </div>
+                </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className={labelClass}>Current Position</label>
-                <input
-                  type="text"
-                  value={form.current_position}
-                  onChange={(e) => setForm({ ...form, current_position: e.target.value })}
-                  className={inputClass}
-                />
-              </div>
-              <div>
-                <label className={labelClass}>New Position</label>
-                <input
-                  type="text"
-                  value={form.new_position}
-                  onChange={(e) => setForm({ ...form, new_position: e.target.value })}
-                  className={inputClass}
-                />
-              </div>
-            </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className={labelClass}>Current Position</label>
+                    <input
+                      type="text"
+                      value={form.current_position}
+                      onChange={(e) => setForm({ ...form, current_position: e.target.value })}
+                      className={inputClass}
+                    />
+                  </div>
+                  <div>
+                    <label className={labelClass}>New Position</label>
+                    <input
+                      type="text"
+                      value={form.new_position}
+                      onChange={(e) => setForm({ ...form, new_position: e.target.value })}
+                      className={inputClass}
+                    />
+                  </div>
+                </div>
+              </>
+            )}
 
             <div>
               <label className={labelClass}>Remarks</label>

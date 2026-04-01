@@ -170,22 +170,22 @@ export default function MovementDetailPage() {
                 {formatters.date(movement.effective_date)}
               </DetailItem>
             )}
-            {movement.current_department && (
+            {movement.movement_type === 'transfer' && movement.current_department && (
               <DetailItem label="Current Department">
                 {movement.current_department}
               </DetailItem>
             )}
-            {movement.target_department && (
+            {movement.movement_type === 'transfer' && movement.target_department && (
               <DetailItem label="Target Department">
                 {movement.target_department}
               </DetailItem>
             )}
-            {movement.current_position && (
+            {movement.movement_type === 'transfer' && movement.current_position && (
               <DetailItem label="Current Position">
                 {movement.current_position}
               </DetailItem>
             )}
-            {movement.new_position && (
+            {movement.movement_type === 'transfer' && movement.new_position && (
               <DetailItem label="New Position">
                 {movement.new_position}
               </DetailItem>

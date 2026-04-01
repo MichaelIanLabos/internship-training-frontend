@@ -11,6 +11,11 @@ const INITIAL_FORM: MovementCreateRequest = {
   employee: 0,
   movement_type: '',
   remarks: '',
+  effective_date: '',
+  current_department: '',
+  target_department: '',
+  current_position: '',
+  new_position: '',
 };
 
 interface CreateMovementModalProps {
@@ -162,6 +167,62 @@ export function CreateMovementModal({
               <p className={errorClass}>{errors.movement_type}</p>
             )}
           </div>
+
+          <div>
+            <label className={labelClass}>Effective Date</label>
+            <input
+              type="date"
+              value={form.effective_date || ''}
+              onChange={(e) => setForm({ ...form, effective_date: e.target.value })}
+              className={inputClass}
+            />
+          </div>
+
+          {form.movement_type === 'transfer' && (
+            <>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className={labelClass}>Current Department</label>
+                  <input
+                    type="text"
+                    value={form.current_department || ''}
+                    onChange={(e) => setForm({ ...form, current_department: e.target.value })}
+                    className={inputClass}
+                  />
+                </div>
+                <div>
+                  <label className={labelClass}>Target Department</label>
+                  <input
+                    type="text"
+                    value={form.target_department || ''}
+                    onChange={(e) => setForm({ ...form, target_department: e.target.value })}
+                    className={inputClass}
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className={labelClass}>Current Position</label>
+                  <input
+                    type="text"
+                    value={form.current_position || ''}
+                    onChange={(e) => setForm({ ...form, current_position: e.target.value })}
+                    className={inputClass}
+                  />
+                </div>
+                <div>
+                  <label className={labelClass}>New Position</label>
+                  <input
+                    type="text"
+                    value={form.new_position || ''}
+                    onChange={(e) => setForm({ ...form, new_position: e.target.value })}
+                    className={inputClass}
+                  />
+                </div>
+              </div>
+            </>
+          )}
 
           <div>
             <label className={labelClass}>Remarks</label>
