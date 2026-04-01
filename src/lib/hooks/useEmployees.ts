@@ -85,6 +85,17 @@ export function useRestoreEmployee() {
   });
 }
 
+export function useSeedEmployees() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: () => employeeApi.seed(),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [EMPLOYEE_QUERY_KEY] });
+    },
+  });
+}
+
 export function useBulkRestoreEmployees() {
   const queryClient = useQueryClient();
 
