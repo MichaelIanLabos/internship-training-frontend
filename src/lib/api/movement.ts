@@ -28,13 +28,18 @@ export const movementApi = {
     return response.data;
   },
 
+  update: async (id: number, data: Partial<MovementCreateRequest>): Promise<Movement> => {
+    const response = await apiClient.patch(`/api/movements/${id}/`, data);
+    return response.data;
+  },
+
   approve: async (id: number): Promise<Movement> => {
     const response = await apiClient.patch(`/api/movements/${id}/approve/`);
     return response.data;
   },
 
-  reject: async (id: number): Promise<Movement> => {
-    const response = await apiClient.patch(`/api/movements/${id}/reject/`);
+  reject: async (id: number, remarks?: string): Promise<Movement> => {
+    const response = await apiClient.patch(`/api/movements/${id}/reject/`, { remarks });
     return response.data;
   },
 };
