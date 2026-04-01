@@ -2,28 +2,21 @@
 
 import { useState, useEffect } from 'react';
 import { Pencil } from 'lucide-react';
-import { Movement } from '@/types/movement';
+import { Movement, MovementCreateRequest } from '@/types/movement';
 import { MOVEMENT_TYPE_OPTIONS } from '@/lib/constants/movement';
 import { labelClass, inputClass, errorClass } from '@/lib/constants/table';
+import { getApiError, getApiFieldErrors } from '@/lib/utils/errors';
 
 interface EditMovementModalProps {
   isOpen: boolean;
   movement: Movement | null;
   onClose: () => void;
-  onUpdate: (data: {
-    movement_type?: string;
-    remarks?: string;
-    effective_date?: string;
-    current_department?: string;
-    target_department?: string;
-    current_position?: string;
-    new_position?: string;
-  }) => Promise<void>;
+  onUpdate: (data: Partial<MovementCreateRequest>) => Promise<void>;
 }
 
 export function EditMovementModal({ isOpen, movement, onClose, onUpdate }: EditMovementModalProps) {
-  const [form, setForm] = useState({
-    movement_type: '',
+  const [form, setForm] = useState<Omit<MovementCreateRequest, 'employee'>>({
+    movement_type: '' as MovementCreateRequest['movement_type'],
     remarks: '',
     effective_date: '',
     current_department: '',
@@ -67,18 +60,12 @@ export function EditMovementModal({ isOpen, movement, onClose, onUpdate }: EditM
     try {
       await onUpdate(form);
       onClose();
-    } catch (err: any) {
-      const data = err.response?.data;
-      if (data?.detail) {
-        setApiError(data.detail);
-      } else if (data && typeof data === 'object') {
-        const fieldErrors: Record<string, string> = {};
-        for (const [key, value] of Object.entries(data)) {
-          fieldErrors[key] = Array.isArray(value) ? value[0] : String(value);
-        }
+    } catch (err: unknown) {
+      const fieldErrors = getApiFieldErrors(err);
+      if (fieldErrors) {
         setErrors(fieldErrors);
       } else {
-        setApiError('Failed to update movement request.');
+        setApiError(getApiError(err, 'Failed to update movement request.'));
       }
     } finally {
       setIsSubmitting(false);
@@ -119,7 +106,7 @@ export function EditMovementModal({ isOpen, movement, onClose, onUpdate }: EditM
               <select
                 value={form.movement_type}
                 onChange={(e) => {
-                  const newType = e.target.value;
+                  const newType = e.target.value as MovementCreateRequest['movement_type'];
                   setForm({
                     ...form,
                     movement_type: newType,
