@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { Check } from 'lucide-react';
+import { getApiError } from '@/lib/utils/errors';
 
 interface ApproveMovementModalProps {
   isOpen: boolean;
@@ -21,8 +22,8 @@ export function ApproveMovementModal({ isOpen, onClose, onConfirm }: ApproveMove
     try {
       await onConfirm();
       onClose();
-    } catch (err: any) {
-      setError(err.response?.data?.detail || 'Failed to approve request.');
+    } catch (err: unknown) {
+      setError(getApiError(err, 'Failed to approve request.'));
     } finally {
       setIsLoading(false);
     }
