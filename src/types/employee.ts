@@ -24,10 +24,5 @@ export interface EmployeeUpdateRequest {
   employment_status?: string;
 }
 
-// Response Types
-export interface PaginatedResponse<T> {
-  total_records: number;
-  total_pages: number;
-  current_page: number;
-  records: T[];
-}
+// Re-export for backwards compat
+export type { PaginatedResponse } from '@/types/api';
