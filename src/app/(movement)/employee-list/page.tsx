@@ -27,7 +27,9 @@ import {
 import { Movement, MovementCreateRequest } from '@/types/movement';
 import { MOVEMENT_TYPE_OPTIONS, MOVEMENT_STATUS_OPTIONS, MovementStatus } from '@/lib/constants/movement';
 import { CreateMovementModal } from '@/components/movements/CreateMovementModal';
-import { ConfirmActionModal } from '@/components/movements/ConfirmActionModal';
+import { ApproveMovementModal } from '@/components/movements/ApproveMovementModal';
+import { RejectMovementModal } from '@/components/movements/RejectMovementModal';
+import { DeleteMovementModal } from '@/components/movements/DeleteMovementModal';
 import { MovementStatusBadge } from '@/components/ui/StatusBadge';
 import { MovementTypeBadge } from '@/components/ui/MovementTypeBadge';
 import { Pagination } from '@/components/employees/Pagination';
@@ -42,10 +44,9 @@ export default function EmployeeListPage() {
   const [searchInput, setSearchInput] = useState('');
   const debouncedSearch = useDebounce(searchInput);
   const [showCreateModal, setShowCreateModal] = useState(false);
-  const [confirmAction, setConfirmAction] = useState<{
-    id: number;
-    action: 'approve' | 'reject' | 'delete';
-  } | null>(null);
+  const [approveId, setApproveId] = useState<number | null>(null);
+  const [rejectId, setRejectId] = useState<number | null>(null);
+  const [deleteId, setDeleteId] = useState<number | null>(null);
 
   const isReady = !authLoading && !!user;
 
@@ -112,15 +113,16 @@ export default function EmployeeListPage() {
     await createMutation.mutateAsync(formData);
   };
 
-  const handleConfirm = async () => {
-    if (!confirmAction) return;
-    if (confirmAction.action === 'approve') {
-      await approveMutation.mutateAsync(confirmAction.id);
-    } else if (confirmAction.action === 'reject') {
-      await rejectMutation.mutateAsync(confirmAction.id);
-    } else {
-      await deleteMutation.mutateAsync(confirmAction.id);
-    }
+  const handleApprove = async () => {
+    if (approveId) await approveMutation.mutateAsync(approveId);
+  };
+
+  const handleReject = async (remarks: string) => {
+    if (rejectId) await rejectMutation.mutateAsync({ id: rejectId, remarks });
+  };
+
+  const handleDelete = async () => {
+    if (deleteId) await deleteMutation.mutateAsync(deleteId);
   };
 
   return (
@@ -145,7 +147,7 @@ export default function EmployeeListPage() {
         />
       </div>
 
-      <div className="overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm">
+      <div className="flex h-[620px] flex-col overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm">
         <div className="flex flex-wrap items-center justify-between gap-4 border-b border-gray-200 px-6 py-5">
           <div className="flex flex-wrap items-end gap-4">
             <div className="flex flex-col gap-1">
@@ -206,11 +208,11 @@ export default function EmployeeListPage() {
 
         {/* Table Body */}
         {isLoading ? (
-          <div className="flex items-center justify-center py-16">
+          <div className="flex flex-1 items-center justify-center">
             <Loader2 className="h-8 w-8 animate-spin text-violet-500" />
           </div>
         ) : isError ? (
-          <div className="py-16 text-center">
+          <div className="flex flex-1 flex-col items-center justify-center text-center">
             <AlertTriangle className="mx-auto h-16 w-16 text-red-400" />
             <h3 className="mt-4 text-base font-semibold text-gray-700">
               Failed to load requests
@@ -229,7 +231,7 @@ export default function EmployeeListPage() {
             </button>
           </div>
         ) : movements.length === 0 ? (
-          <div className="py-16 text-center">
+          <div className="flex flex-1 flex-col items-center justify-center text-center">
             <Table2 className="mx-auto h-16 w-16 text-gray-300" />
             <h3 className="mt-4 text-base font-semibold text-gray-700">
               {statusFilter
@@ -253,10 +255,10 @@ export default function EmployeeListPage() {
           </div>
         ) : (
           <>
-            <div className="overflow-x-auto">
-              <table className="min-w-full">
+            <div className="flex-1 overflow-auto">
+              <table className="w-full">
                 <thead>
-                  <tr className="border-b border-gray-200 bg-gray-50">
+                  <tr className="sticky top-0 border-b border-gray-200 bg-gray-50">
                     <th className={thClass}>Employee</th>
                     <th className={thClass}>Type</th>
                     <th className={thClass}>Status</th>
@@ -306,24 +308,9 @@ export default function EmployeeListPage() {
                         <ActionButtons
                           movement={movement}
                           user={user}
-                          onApprove={() =>
-                            setConfirmAction({
-                              id: movement.id,
-                              action: 'approve',
-                            })
-                          }
-                          onReject={() =>
-                            setConfirmAction({
-                              id: movement.id,
-                              action: 'reject',
-                            })
-                          }
-                          onDelete={() =>
-                            setConfirmAction({
-                              id: movement.id,
-                              action: 'delete',
-                            })
-                          }
+                          onApprove={() => setApproveId(movement.id)}
+                          onReject={() => setRejectId(movement.id)}
+                          onDelete={() => setDeleteId(movement.id)}
                         />
                       </td>
                     </tr>
@@ -352,11 +339,20 @@ export default function EmployeeListPage() {
         onCreate={handleCreate}
         employees={employees}
       />
-      <ConfirmActionModal
-        isOpen={!!confirmAction}
-        action={confirmAction?.action || 'approve'}
-        onClose={() => setConfirmAction(null)}
-        onConfirm={handleConfirm}
+      <ApproveMovementModal
+        isOpen={!!approveId}
+        onClose={() => setApproveId(null)}
+        onConfirm={handleApprove}
+      />
+      <RejectMovementModal
+        isOpen={!!rejectId}
+        onClose={() => setRejectId(null)}
+        onConfirm={handleReject}
+      />
+      <DeleteMovementModal
+        isOpen={!!deleteId}
+        onClose={() => setDeleteId(null)}
+        onConfirm={handleDelete}
       />
     </div>
   );
