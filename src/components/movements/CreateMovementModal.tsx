@@ -151,9 +151,19 @@ export function CreateMovementModal({
             </label>
             <select
               value={form.movement_type}
-              onChange={(e) =>
-                setForm({ ...form, movement_type: e.target.value })
-              }
+              onChange={(e) => {
+                const newType = e.target.value;
+                setForm({
+                  ...form,
+                  movement_type: newType,
+                  ...(newType !== 'transfer' && {
+                    current_department: '',
+                    target_department: '',
+                    current_position: '',
+                    new_position: '',
+                  }),
+                });
+              }}
               className={inputClass}
             >
               <option value="">Select type</option>
