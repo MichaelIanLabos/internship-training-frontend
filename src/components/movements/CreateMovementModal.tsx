@@ -6,6 +6,7 @@ import { Employee } from '@/types/employee';
 import { MovementCreateRequest } from '@/types/movement';
 import { MOVEMENT_TYPE_OPTIONS } from '@/lib/constants/movement';
 import { labelClass, inputClass, errorClass } from '@/lib/constants/table';
+import { getApiError, getApiFieldErrors } from '@/lib/utils/errors';
 
 const INITIAL_FORM: MovementCreateRequest = {
   employee: 0,
@@ -56,28 +57,12 @@ export function CreateMovementModal({
       setErrors({});
       setApiError('');
       onClose();
-    } catch (err: any) {
-      const data = err.response?.data;
-      if (data) {
-        if (typeof data === 'object' && !Array.isArray(data)) {
-          const fieldErrors: Record<string, string> = {};
-          for (const [key, value] of Object.entries(data)) {
-            if (Array.isArray(value)) {
-              fieldErrors[key] = value[0];
-            } else if (typeof value === 'string') {
-              fieldErrors[key] = value;
-            }
-          }
-          if (Object.keys(fieldErrors).length > 0) {
-            setErrors(fieldErrors);
-          } else {
-            setApiError(data.detail || 'Failed to create movement request.');
-          }
-        } else {
-          setApiError('Failed to create movement request.');
-        }
+    } catch (err: unknown) {
+      const fieldErrors = getApiFieldErrors(err);
+      if (fieldErrors) {
+        setErrors(fieldErrors);
       } else {
-        setApiError('Network error. Please try again.');
+        setApiError(getApiError(err, 'Failed to create movement request.'));
       }
     } finally {
       setIsSubmitting(false);
@@ -152,7 +137,7 @@ export function CreateMovementModal({
             <select
               value={form.movement_type}
               onChange={(e) => {
-                const newType = e.target.value;
+                const newType = e.target.value as MovementCreateRequest['movement_type'];
                 setForm({
                   ...form,
                   movement_type: newType,
